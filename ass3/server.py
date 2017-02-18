@@ -44,15 +44,15 @@ def search():
     cursor = connection.cursor()
 
     try:
-        word = request.args['word']
-        print('searching for "' + word + '"')
-        cursor.execute('SELECT * FROM foods WHERE name IS ?', (word,))
-        message = cursor.fetchone()
+        name = request.args['name']
+        print('searching for "' + name + '"')
+        cursor.execute('SELECT * FROM foods WHERE name IS ?', (name,))
+        results = jsonify(cursor.fetchone())
     except:
         connection.rollback()
-        message = 'Failed to get search results'
+        results = 'Failed to get search results'
     finally:
-        return render_template('result.html', message=message)
+        return results
         connection.close()
 
 @app.route('/favorite')
@@ -62,15 +62,13 @@ def favorite():
 
     try:
         print('Trying quering favorite food')
-        cursor.execute('SELECT * FROM foods WHERE name IS "Pancakes"')
-        message = cursor.fetchone()
-        print(message)
-        #message = jsonify(message)
+        cursor.execute('SELECT * FROM foods WHERE name IS "pancakes"')
+        results = jsonify(cursor.fetchone())
     except:
         connection.rollback()
-        message = 'Failed FIND'
+        results = 'Failed FIND'
     finally:
-        return render_template('result.html', message = message)
+        return results
         connection.close()
 
 @app.route('/drop')
