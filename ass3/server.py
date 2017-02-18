@@ -44,16 +44,16 @@ def search():
     cursor = connection.cursor()
 
     try:
-        word = request.form['word']
-        connection.execute('')
+        word = request.args['word']
+        print('searching for "' + word + '"')
+        cursor.execute('SELECT * FROM foods WHERE name IS ?', (word,))
         message = cursor.fetchone()
     except:
         connection.rollback()
         message = 'Failed to get search results'
     finally:
         return render_template('result.html', message=message)
-
-    return 'Hey'
+        connection.close()
 
 @app.route('/favorite')
 def favorite():
@@ -62,14 +62,27 @@ def favorite():
 
     try:
         print('Trying quering favorite food')
-        cursor.execute('SELECT * FROM foods WHERE name="Pancakes"')
+        cursor.execute('SELECT * FROM foods WHERE name IS "Pancakes"')
         message = cursor.fetchone()
         print(message)
         #message = jsonify(message)
-        print(message)
     except:
         connection.rollback()
         message = 'Failed FIND'
     finally:
         return render_template('result.html', message = message)
         connection.close()
+
+@app.route('/drop')
+def drop():
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute('DROP TABLE foods')
+        message = 'dropped'
+    except:
+        connection.rollback()
+        message = 'Drop failed'
+    finally:
+        return render_template('result.html', message=message)
